@@ -87,7 +87,7 @@ public class ChatClient extends JFrame {
 	
 	private void disConnectToServer() {
 		try {
-			dos.writeUTF("exiting");
+			writeToServer("EXIT");
 			dos.close();
 			dis.close();
 			s.close();
