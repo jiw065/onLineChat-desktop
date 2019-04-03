@@ -1,9 +1,70 @@
+import java.awt.BorderLayout;
+import java.awt.TextArea;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
-public class ChatClient {
+import javax.swing.JFrame;
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+public class ChatClient extends JFrame {
+
+	TextField tfTxt = new TextField();
+	TextArea taContent = new TextArea();
+
+	// action listener will act to all the events so do not use keyaction listener
+	private class TFListiner implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String text = tfTxt.getText();
+			taContent.append(text);
+			taContent.append("\n");
+			tfTxt.setText("");
+
+		}
 
 	}
 
+	public void showWindow() {
+		this.setLocation(Constant.WINDOW_X, Constant.WINDOW_Y);
+		this.setSize(Constant.WINDOW_WIDTH, Constant.WINDOW_HEIGHT);
+		this.setTitle("Online Chat Practice");
+		this.setVisible(true);
+		this.add(tfTxt, BorderLayout.SOUTH);
+		this.add(taContent, BorderLayout.NORTH);
+		pack();
+		connectToServer();
+		// exit the application when closing the window
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
+		taContent.setEditable(false);
+		tfTxt.addActionListener(new TFListiner());
+	}
+
+	private void connectToServer() {
+
+		try {
+			Socket s = new Socket("127.0.0.1", 6666);
+			System.out.println("Connect to Server"); // delete
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void main(String[] args) {
+		new ChatClient().showWindow();
+
+	}
 }

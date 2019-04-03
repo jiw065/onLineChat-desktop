@@ -50,11 +50,11 @@ public class ChatWindow extends JFrame {
 	
 
 	
-	
-
-	public static void main(String[] args) {
-		ChatWindow c = new ChatWindow();
-		c.showWindow();
-
-	}
+//	
+//
+//	public static void main(String[] args) {
+//		ChatWindow c = new ChatWindow();
+//		c.showWindow();
+//
+//	}
 }
