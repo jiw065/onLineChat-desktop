@@ -1,8 +1,12 @@
+import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Robot;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -12,6 +16,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
@@ -23,17 +29,40 @@ public class ChatClient extends JFrame {
 	DataOutputStream dos;
 	DataInputStream dis;
 	// action listener will act to all the events so do not use keyaction listener
-	private class TFListiner implements ActionListener {
+	private class TFListiner extends KeyAdapter {
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			String text = tfTxt.getText();
-			taContent.setText(text);
-			writeToServer(text);
-			tfTxt.setText("");
+		public void keyPressed(KeyEvent e) {
+			String text = "";
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+				text = tfTxt.getText();				
+			}
 			
+			writeToServer(text);
+			taContent.setText(readFromServer());
+			tfTxt.setText("");
 		}
+		
+	}
+	private class RefreshThread implements Runnable{
 
+		@Override
+		public void run() {
+			while(true) {
+				Robot robot;
+				try {
+					robot = new Robot();
+					robot.keyPress(KeyEvent.VK_F5);
+					Thread.sleep(100);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			}
+		}
+		
 	}
 
 	public void showWindow() {
@@ -45,6 +74,7 @@ public class ChatClient extends JFrame {
 		this.add(taContent, BorderLayout.NORTH);
 		pack();
 		connectToServer();
+		
 		// exit the application when closing the window
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -54,11 +84,13 @@ public class ChatClient extends JFrame {
 			}
 		});
 		taContent.setEditable(false);
-		tfTxt.addActionListener(new TFListiner());
+		
+		tfTxt.addKeyListener(new TFListiner());
+		new Thread(new RefreshThread()).start();
+		
 	}
 
 	private void writeToServer(String str) {
-		System.out.println("writing"); //test
 		try {
 			dos.writeUTF(str);
 			dos.flush();
@@ -67,7 +99,19 @@ public class ChatClient extends JFrame {
 			e.printStackTrace();
 		}
 		
-		//s.close();
+	}
+	
+	
+	private String readFromServer() {
+		String str = "";
+		System.out.println("reading"); //test
+		try {
+			str = dis.readUTF();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return str;
 	}
 	private void connectToServer() {
 
