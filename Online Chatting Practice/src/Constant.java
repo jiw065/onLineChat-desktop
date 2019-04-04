@@ -7,5 +7,6 @@ public class Constant {
 	public static final int WINDOW_HEIGHT = 500;
 	public static final int WINDOW_X = 300;
 	public static final int WINDOW_Y = 300;
+	public static final int PORT_NUMBER = 8888;
 	
 }
