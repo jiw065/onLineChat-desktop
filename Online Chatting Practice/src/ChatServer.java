@@ -1,16 +1,14 @@
 import java.util.List;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class ChatServer {
-	List<String> strList = new ArrayList<String>(); 
-	
+	List<String> strList = new ArrayList<String>();
+
 	private class clientThread implements Runnable {
 		private Socket ts = null;
 		private boolean bConnected = false;
@@ -19,7 +17,7 @@ public class ChatServer {
 
 		@Override
 		public void run() {
-			System.out.println("Connected to Client " + ts.getPort());	
+			System.out.println("Connected to Client " + ts.getPort());
 			bConnected = true;
 
 			try {
@@ -33,29 +31,30 @@ public class ChatServer {
 			try {
 				while (bConnected) {
 					String str = dis.readUTF();
-					if(!str.equals("")) {
-						str = "Client "+ts.getPort()+": "+str+"\n";
+					if (!str.equals("")) {
+						str = "Client " + ts.getPort() + ": " + str + "\n";
 						strList.add(str);
 					}
-					
+
 					String allStr = "";
-					if(str.equals("EXIT")) break;
-					if(!strList.isEmpty()) {
-						for(String s:strList) {
-							allStr+=s;
+					if (str.equals("EXIT"))
+						break;
+					if (!strList.isEmpty()) {
+						for (String s : strList) {
+							allStr += s;
 						}
 					}
-					if(strList.size()>100) {
+					if (strList.size() > 100) {
 						strList.clear();
 						allStr = "";
 					}
 					dos.writeUTF(allStr);
 				}
 			} catch (IOException e) {
-				System.out.println("Client "+ts.getPort()+" reading error");
+				System.out.println("Client " + ts.getPort() + " reading error");
 			} finally {
 				bConnected = false;
-				System.out.println("disconnecting client "+ts.getPort());
+				System.out.println("disconnecting client " + ts.getPort());
 				try {
 					dis.close();
 					dos.flush();
@@ -63,7 +62,7 @@ public class ChatServer {
 					ts.close();
 
 				} catch (IOException e) {
-					System.out.println("client "+ts.getPort()+ "closing error" );
+					System.out.println("client " + ts.getPort() + "closing error");
 				}
 			}
 
