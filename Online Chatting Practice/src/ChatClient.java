@@ -22,19 +22,35 @@ public class ChatClient extends JFrame {
 	Socket s;
 	DataOutputStream dos;
 	DataInputStream dis;
+	boolean receving = true;
 	// action listener will act to all the events so do not use keyaction listener
 	private class TFListiner implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String text = tfTxt.getText();
-			taContent.setText(text);
+			//taContent.setText(text);
 			writeToServer(text);
 			tfTxt.setText("");
 			
 		}
 
 	}
+	
+	private class RecivingThread implements Runnable {
+
+		@Override
+		public void run() {
+			while (receving) {
+				taContent.append(readFromServer());
+				taContent.append("\n");
+				
+
+			}
+		}
+
+	}
+
 
 	public void showWindow() {
 		this.setLocation(Constant.WINDOW_X, Constant.WINDOW_Y);
@@ -45,6 +61,7 @@ public class ChatClient extends JFrame {
 		this.add(taContent, BorderLayout.NORTH);
 		pack();
 		connectToServer();
+		new Thread(new RecivingThread()).start();
 		// exit the application when closing the window
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -69,10 +86,21 @@ public class ChatClient extends JFrame {
 		
 		//s.close();
 	}
+	
+	private String readFromServer() {
+		String str = "";
+		try {
+			str = dis.readUTF();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return str;
+	}
+	
 	private void connectToServer() {
 
 		try {
-			s = new Socket("127.0.0.1", 6666);
+			s = new Socket("127.0.0.1", Constant.PORT_NUMBER);
 			dos = new DataOutputStream(s.getOutputStream());
 			dis = new DataInputStream(s.getInputStream());
 			
@@ -87,8 +115,9 @@ public class ChatClient extends JFrame {
 	
 	private void disConnectToServer() {
 		try {
-			dos.writeUTF("exiting");
+			dos.writeUTF("is off line");
 			dos.close();
+			receving = false;
 			dis.close();
 			s.close();
 		} catch (IOException e) {
