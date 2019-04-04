@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,15 +12,24 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
-
+/**
+ * this is a simple desktop chat app client
+ * @author Amber
+ *
+ */
 public class ChatClient extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	TextField tfTxt = new TextField();
 	TextArea taContent = new TextArea();
 	Socket s;
 	DataOutputStream dos;
 	DataInputStream dis;
 	boolean receving = true;
+	Thread rt = new Thread(new RecivingThread());
 
 	// action listener will act to all the events so do not use keyaction listener
 	private class TFListiner implements ActionListener {
@@ -60,7 +67,7 @@ public class ChatClient extends JFrame {
 		this.add(taContent, BorderLayout.NORTH);
 		pack();
 		connectToServer();
-		new Thread(new RecivingThread()).start();
+		rt.start();
 		// exit the application when closing the window
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -111,13 +118,22 @@ public class ChatClient extends JFrame {
 	private void disConnectToServer() {
 		try {
 			dos.writeUTF("is off line");
-			dos.close();
 			receving = false;
-			dis.close();
-			s.close();
-		} catch (IOException e) {
+			rt.join();  // the thread should join to the main thread, this actually really close the thread
+			
+		} catch (IOException|InterruptedException e) {
 			e.printStackTrace();
-		}
+		} finally {
+			try {
+				
+				dos.close();
+				dis.close();
+				s.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+			
+		}																																																															
 	}
 
 	public static void main(String[] args) {

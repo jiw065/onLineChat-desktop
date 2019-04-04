@@ -1,11 +1,21 @@
+/*
+ * 
+ */
 import java.util.List;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * This class is the desktop chat app Server.
+ * it uses multi-thread resolution to support multiple client connections
+ * @author Amber
+ * @date 2019.04.04
+ */
 public class ChatServer {
 	List<clientThread> cList = new ArrayList<clientThread>();
 
@@ -30,21 +40,25 @@ public class ChatServer {
 
 			try {
 				writeToAllClients("Client " + ts.getPort() + " is on line");
+				String str = "";
 				while (bConnected) {
-					String str = dis.readUTF();
 					if (str.equals("EXIT")) {
 						break;
 					}
+					str = dis.readUTF();					
 					// need to send to all the clients
 					str = "Client " + ts.getPort() + ": " + str;
 					writeToAllClients(str);
-
 				}
+			} catch (EOFException e ) {
+				System.out.println("disconnecting client " + ts.getPort());				
 			} catch (IOException e) {
+				e.printStackTrace();
 				System.out.println("Client " + ts.getPort() + " reading error");
 			} finally {
 				bConnected = false;
-				System.out.println("disconnecting client " + ts.getPort());
+				//remove the sending client from clist so it will resolve the write to all client sending error
+				cList.remove(this);   				
 				try {
 					dis.close();
 					dos.flush();
@@ -52,6 +66,7 @@ public class ChatServer {
 					ts.close();
 
 				} catch (IOException e) {
+					e.printStackTrace();
 					System.out.println("client " + ts.getPort() + "closing error");
 				}
 			}
@@ -67,6 +82,7 @@ public class ChatServer {
 				try {
 					c.dos.writeUTF(s);
 				} catch (IOException e) {
+					e.printStackTrace();
 					System.out.println("Client " + c.ts.getPort() + " sendind error");
 				}
 			}

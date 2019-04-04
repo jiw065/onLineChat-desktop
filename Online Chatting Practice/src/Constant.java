@@ -1,7 +1,8 @@
-
-
-import java.awt.Image;
-
+/**
+ * this class stores all constant values used by chat client and server 
+ * @author Amber
+ *
+ */
 public class Constant {
 	public static final int WINDOW_WIDTH = 500;
 	public static final int WINDOW_HEIGHT = 500;
