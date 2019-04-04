@@ -23,20 +23,21 @@ public class ChatClient extends JFrame {
 	DataOutputStream dos;
 	DataInputStream dis;
 	boolean receving = true;
+
 	// action listener will act to all the events so do not use keyaction listener
 	private class TFListiner implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String text = tfTxt.getText();
-			//taContent.setText(text);
+			// taContent.setText(text);
 			writeToServer(text);
 			tfTxt.setText("");
-			
+
 		}
 
 	}
-	
+
 	private class RecivingThread implements Runnable {
 
 		@Override
@@ -44,13 +45,11 @@ public class ChatClient extends JFrame {
 			while (receving) {
 				taContent.append(readFromServer());
 				taContent.append("\n");
-				
 
 			}
 		}
 
 	}
-
 
 	public void showWindow() {
 		this.setLocation(Constant.WINDOW_X, Constant.WINDOW_Y);
@@ -65,7 +64,7 @@ public class ChatClient extends JFrame {
 		// exit the application when closing the window
 		this.addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent e) {	
+			public void windowClosing(WindowEvent e) {
 				disConnectToServer();
 				System.exit(0);
 			}
@@ -75,18 +74,15 @@ public class ChatClient extends JFrame {
 	}
 
 	private void writeToServer(String str) {
-		System.out.println("writing"); //test
 		try {
 			dos.writeUTF(str);
 			dos.flush();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//s.close();
+
 	}
-	
+
 	private String readFromServer() {
 		String str = "";
 		try {
@@ -96,15 +92,14 @@ public class ChatClient extends JFrame {
 		}
 		return str;
 	}
-	
+
 	private void connectToServer() {
 
 		try {
 			s = new Socket("127.0.0.1", Constant.PORT_NUMBER);
 			dos = new DataOutputStream(s.getOutputStream());
 			dis = new DataInputStream(s.getInputStream());
-			
-			System.out.println("Connect to Server"); // delete
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -112,7 +107,7 @@ public class ChatClient extends JFrame {
 		}
 
 	}
-	
+
 	private void disConnectToServer() {
 		try {
 			dos.writeUTF("is off line");
@@ -121,7 +116,6 @@ public class ChatClient extends JFrame {
 			dis.close();
 			s.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

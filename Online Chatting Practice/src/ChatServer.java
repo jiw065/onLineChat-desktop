@@ -29,16 +29,16 @@ public class ChatServer {
 			}
 
 			try {
-				writeToAllClients("Client " + ts.getPort()+" is on line");
-				while (bConnected) {					
+				writeToAllClients("Client " + ts.getPort() + " is on line");
+				while (bConnected) {
 					String str = dis.readUTF();
 					if (str.equals("EXIT")) {
 						break;
 					}
-					// need to send to all the clients 
+					// need to send to all the clients
 					str = "Client " + ts.getPort() + ": " + str;
 					writeToAllClients(str);
-					
+
 				}
 			} catch (IOException e) {
 				System.out.println("Client " + ts.getPort() + " reading error");
@@ -57,13 +57,13 @@ public class ChatServer {
 			}
 
 		}
-		
+
 		private void setThreadSocket(Socket s) {
 			ts = s;
 		}
-		
+
 		private void writeToAllClients(String s) {
-			for (clientThread c : cList) {						
+			for (clientThread c : cList) {
 				try {
 					c.dos.writeUTF(s);
 				} catch (IOException e) {
