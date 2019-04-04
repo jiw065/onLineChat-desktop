@@ -1,16 +1,21 @@
+import java.util.List;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class ChatServer {
+	List<String> strList = new ArrayList<String>(); 
+	
 	private class clientThread implements Runnable {
-		Socket ts = null;
-		boolean bConnected = false;
-		DataOutputStream dos = null;
-		DataInputStream dis = null;
+		private Socket ts = null;
+		private boolean bConnected = false;
+		private DataOutputStream dos = null;
+		private DataInputStream dis = null;
 
 		@Override
 		public void run() {
@@ -28,8 +33,23 @@ public class ChatServer {
 			try {
 				while (bConnected) {
 					String str = dis.readUTF();
+					if(!str.equals("")) {
+						str = "Client "+ts.getPort()+": "+str+"\n";
+						strList.add(str);
+					}
+					
+					String allStr = "";
 					if(str.equals("EXIT")) break;
-					System.out.println(str);
+					if(!strList.isEmpty()) {
+						for(String s:strList) {
+							allStr+=s;
+						}
+					}
+					if(strList.size()>100) {
+						strList.clear();
+						allStr = "";
+					}
+					dos.writeUTF(allStr);
 				}
 			} catch (IOException e) {
 				System.out.println("Client "+ts.getPort()+" reading error");
@@ -55,7 +75,7 @@ public class ChatServer {
 
 	}
 
-	public void serverStart() {
+	private void serverStart() {
 		boolean connected = false;
 		ServerSocket ss = null;
 		try {
